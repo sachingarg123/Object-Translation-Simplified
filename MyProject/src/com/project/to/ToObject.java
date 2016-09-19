@@ -12,6 +12,8 @@ package com.project.to;
 
 import java.util.ArrayList;
 
+import com.project.annotation.skipMethod;
+
 public class ToObject
 {
 
@@ -57,6 +59,7 @@ public class ToObject
         this.id = id;
     }
 
+    @skipMethod (isValid = "customer.specification")
     public void withSpecification(String specification)
     {
         this.specification = specification;

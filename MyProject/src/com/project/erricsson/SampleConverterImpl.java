@@ -10,9 +10,14 @@
 // **********************************************************************
 package com.project.erricsson;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
+import com.ericsson.jsonobject.MainJson;
+import com.google.gson.Gson;
 import com.project.from.FromObject;
 import com.project.from.FromStudent;
 import com.project.to.ToObject;
@@ -23,8 +28,42 @@ public class SampleConverterImpl
 
     static void withModelConverter(FromObject fromObj) throws ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
     {
-        ToObject toObject = (ToObject) ModelConverterApi.translateObject(fromObj);
+        ToObject toObject = (ToObject) ModelConverterApi.translateObjectWithoutAnnotation(fromObj);
         displayData(toObject);
+    }
+
+    static void withAnnotation(FromObject fromObj) throws ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
+    {
+
+        MainJson mainJson = (MainJson) readJson();
+        String[] omitFilter = mainJson.getResources()[0].getOmitFilter();
+        ToObject toObject = (ToObject) ModelConverterApi.translateObjectWithAnnotation(fromObj, omitFilter);
+        displayData(toObject);
+    }
+
+    static Object readJson()
+    {
+
+        Gson gson = new Gson();
+        MainJson mainJson = null;
+        try (Reader reader = new FileReader("C:\\Sachin\\Docs\\Security\\SSO_CPM\\rule_json.json"))
+        {
+
+            // Convert JSON to Java Object
+            mainJson = gson.fromJson(reader, MainJson.class);
+            System.out.println(mainJson);
+
+            // Convert JSON to JsonElement, and later to String
+            /*JsonElement json = gson.fromJson(reader, JsonElement.class);
+            String jsonInString = gson.toJson(json);
+            System.out.println(jsonInString);*/
+
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return mainJson;
     }
 
     static void withoutModelConverter(FromObject fromObj)
@@ -56,6 +95,7 @@ public class SampleConverterImpl
     {
         withModelConverter(fromObj);
         withoutModelConverter(fromObj);
+        withAnnotation(fromObj);
     }
 
     static FromObject fromObj = new FromObject();
